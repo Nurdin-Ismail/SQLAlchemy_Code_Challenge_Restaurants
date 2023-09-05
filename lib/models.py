@@ -32,6 +32,26 @@ class Restaurant(Base):
     reviews = relationship('Review', backref=backref('restaurant'))
     customers = relationship('Customer', secondary= restaurant_customer, back_populates='restaurants')
 
+    def get_reviews(self):
+        
+        return self.reviews
+    
+    def get_customers(self):
+       
+        return self.customers
+    
+    def all_reviews(self):
+        
+        reviews = [review.full_review() for review in self.get_reviews()]
+        return reviews
+    
+    @classmethod
+    def fanciest(cls):
+        
+        restaurant = session.query(cls).order_by(desc(cls.price)).first()
+        return restaurant
+    
+
     def __repr__(self):
         return f"Resturant name : {self.name}, price: {self.price}"
     
@@ -46,6 +66,44 @@ class Customer(Base):
     
     reviews = relationship('Review', backref=backref('customer'))
     restaurants = relationship('Restaurant', secondary=restaurant_customer, back_populates='customers')
+    
+
+    def full_name(self):
+        
+        return f"{self.first_name} {self.last_name}"
+
+    def get_reviews(self):
+        
+        return self.reviews
+    
+    def get_restaurants(self):
+        
+        return self.restaurants
+    
+    def favorite_restaurant(self):
+        
+        review = max(self.get_reviews(), key=lambda a: a.star_rating)
+        return review.get_restaurant()
+    
+    def add_review(self, restaurant, rating):
+        
+        review = Review(
+            customer_id=self.id,
+            restaurant_id=restaurant.id,
+            star_rating=rating)
+        
+        session = Session.object_session(self)
+        session.add(review)
+        session.commit()
+
+    def delete_reviews(self, restaurant):
+        
+        session = Session.object_session(self)
+        delete_q = Review.__table__.delete().where(Review.customer_id==self.id).where(Review.restaurant_id==restaurant.id)
+        # reviews = session.query(Review).filter_by(customer_id=self.id, restaurant_id=restaurant.id)[0]
+        session.execute(delete_q)
+        session.commit()
+
 
     def __repr__(self):
         return f"Customers firstname : {self.first_name}, price: {self.last_name}"
@@ -64,7 +122,7 @@ class Review(Base):
     customer_id = Column(Integer(), ForeignKey('customers.id'))
 
     
-    
+    @property
     def get_customer(self):
         return self.customer
 

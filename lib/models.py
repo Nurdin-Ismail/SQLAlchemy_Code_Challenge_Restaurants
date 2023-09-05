@@ -2,6 +2,9 @@ from sqlalchemy import create_engine;
 from sqlalchemy import Column, Integer, String, ForeignKey, Table
 from sqlalchemy.orm import relationship, sessionmaker, backref
 from sqlalchemy.ext.declarative import declarative_base
+import random
+from faker import Faker
+fake = Faker()
 
 
 Base = declarative_base()
@@ -41,7 +44,7 @@ class Customer(Base):
     first_name = Column(String(), index = True)
     last_name = Column(String())
     
-    reviews = relationship('Review', backref=backref('customerr'))
+    reviews = relationship('Review', backref=backref('customer'))
     restaurants = relationship('Restaurant', secondary=restaurant_customer, back_populates='customers')
 
     def __repr__(self):
@@ -59,14 +62,24 @@ class Review(Base):
     
     restaurant_id = Column(Integer(), ForeignKey('restaurants.id'))
     customer_id = Column(Integer(), ForeignKey('customers.id'))
+
     
     
+    def get_customer(self):
+        return self.customer
+
+    # @property
+    def get_restaurant(self):
+        return self.restaurant
+
     def __repr__(self):
-        return (f"Customer({self.customer_id}) | Restaurant({self.restaurant_id}) | start-rating({self.star_rating}) |"
-                f" {self.description}: {self.star_rating} stars\n")
+        return (f"Customer({self.customer_id}) | Restaurant({self.restaurant_id}) | star-rating({self.star_rating}) |"
+                f" {self.comment}: {self.star_rating} stars\n")
     
     
-    
+
+
+
     
     
     

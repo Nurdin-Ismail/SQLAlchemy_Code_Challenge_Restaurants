@@ -1,8 +1,8 @@
-"""Added Restaurant, Customer and Review models
+"""Added models
 
-Revision ID: 7e5ac99e6c27
-Revises: 3011b4a511e0
-Create Date: 2023-09-05 09:40:36.584923
+Revision ID: 0bb729df688f
+Revises: 1ff637ea595f
+Create Date: 2023-09-05 12:49:59.447900
 
 """
 from alembic import op
@@ -10,8 +10,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '7e5ac99e6c27'
-down_revision = '3011b4a511e0'
+revision = '0bb729df688f'
+down_revision = '1ff637ea595f'
 branch_labels = None
 depends_on = None
 
@@ -42,6 +42,7 @@ def upgrade():
     op.create_table('reviews',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('star_ratings', sa.Integer(), nullable=True),
+    sa.Column('reviews', sa.String(), nullable=True),
     sa.Column('restaurant_id', sa.Integer(), nullable=True),
     sa.Column('customer_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['customer_id'], ['customers.id'], ),
